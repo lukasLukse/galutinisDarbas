@@ -58,19 +58,21 @@ const POST_QUESTION = async (req, res) => {
 
 const DELETE_QUESTION = async (req, res) => {
   try {
-    const response = await QuestionModel.findOneAndDelete({
-      id: req.params.id,
-    });
+    const question = await QuestionModel.findOne({ id: req.params.id });
 
-    if (!response) {
-      return res.status(404).json({
-        message: "This question is already deleted, refresh your browser.",
-      });
+    if (!question) {
+      return res.status(404).json({ message: "Question not found." });
     }
 
-    return res
-      .status(200)
-      .json({ message: "Question was deleted", question: response });
+    if (question.userId !== req.body.userId) {
+      return res
+        .status(403)
+        .json({ message: "You are not authorized to delete this question." });
+    }
+
+    await QuestionModel.findOneAndDelete({ id: req.params.id });
+
+    return res.status(200).json({ message: "Question was deleted", question });
   } catch (err) {
     console.log(err);
     return res.status(500).json({ message: "Error in application." });
