@@ -1,18 +1,40 @@
 import { v4 as uuidv4 } from "uuid";
 import QuestionModel from "../model/question.js";
 
-const QUESTIONS = async (req, res) => {
+const GET_QUESTIONS = async (req, res) => {
   try {
-    const response = await QuestionModel.find({ question: req.body.question });
+    const response = await QuestionModel.find({ userId: req.body.userId });
 
-    return res.status(200).json({ question: response });
+    return res.status(200).json({ questions: response });
   } catch (err) {
     console.log(err);
     return res.status(500).json({ message: "Error in application." });
   }
 };
 
-const QUESTION = async (req, res) => {
+const GET_QUESTIONS_ALL = async (req, res) => {
+  try {
+    const response = await QuestionModel.find({});
+
+    return res.status(200).json({ questions: response });
+  } catch (err) {
+    console.log(err);
+    return res.status(500).json({ message: "Error in application." });
+  }
+};
+
+const GET_QUESTION_BY_ID = async (req, res) => {
+  try {
+    const response = await QuestionModel.findOne({ id: req.params.id });
+
+    return res.status(200).json({ questions: response });
+  } catch (err) {
+    console.log(err);
+    return res.status(500).json({ message: "error in application" });
+  }
+};
+
+const POST_QUESTION = async (req, res) => {
   try {
     const question = {
       id: uuidv4(),
@@ -22,6 +44,7 @@ const QUESTION = async (req, res) => {
     };
 
     const response = new QuestionModel(question);
+
     await response.save();
 
     return res
@@ -54,4 +77,10 @@ const DELETE_QUESTION = async (req, res) => {
   }
 };
 
-export { QUESTIONS, QUESTION, DELETE_QUESTION };
+export {
+  GET_QUESTIONS,
+  POST_QUESTION,
+  DELETE_QUESTION,
+  GET_QUESTION_BY_ID,
+  GET_QUESTIONS_ALL,
+};

@@ -53,7 +53,7 @@ const LOGIN = async (req, res) => {
     const token = jwt.sign(
       { email: user.email, userId: user.id },
       process.env.JWT_SECRET,
-      { expiresIn: "15m" }
+      { expiresIn: "45m" }
     );
 
     return res.status(200).json({ token: token, userId: user.id });
@@ -63,4 +63,13 @@ const LOGIN = async (req, res) => {
   }
 };
 
-export { REGISTER, LOGIN };
+const VALIDATE_LOGIN = async (req, res) => {
+  try {
+    res.status(200).json({ message: "user ok" });
+  } catch (err) {
+    console.log(err);
+    return res.status(500).json({ message: "error in application" });
+  }
+};
+
+export { REGISTER, LOGIN, VALIDATE_LOGIN };
