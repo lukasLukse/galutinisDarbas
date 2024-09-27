@@ -1,6 +1,29 @@
 import { v4 as uuidv4 } from "uuid";
 import QuestionModel from "../model/question.js";
 
+const POST_QUESTION = async (req, res) => {
+  try {
+    const question = {
+      id: uuidv4(),
+      userId: req.body.userId,
+      name: req.body.name,
+      date: new Date(),
+      question: req.body.question,
+    };
+
+    const response = new QuestionModel(question);
+
+    await response.save();
+
+    return res
+      .status(201)
+      .json({ message: "Your question is posted.", response: response });
+  } catch (err) {
+    console.log(err);
+    return res.status(500).json({ message: "Error in application." });
+  }
+};
+
 const GET_QUESTIONS = async (req, res) => {
   try {
     const response = await QuestionModel.find({ userId: req.body.userId });
@@ -31,28 +54,6 @@ const GET_QUESTION_BY_ID = async (req, res) => {
   } catch (err) {
     console.log(err);
     return res.status(500).json({ message: "error in application" });
-  }
-};
-
-const POST_QUESTION = async (req, res) => {
-  try {
-    const question = {
-      id: uuidv4(),
-      userId: req.body.userId,
-      date: new Date(),
-      question: req.body.question,
-    };
-
-    const response = new QuestionModel(question);
-
-    await response.save();
-
-    return res
-      .status(201)
-      .json({ message: "Your question is posted.", response: response });
-  } catch (error) {
-    console.log(err);
-    return res.status(500).json({ message: "Error in application." });
   }
 };
 
