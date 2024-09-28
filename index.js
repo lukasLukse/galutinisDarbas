@@ -4,6 +4,7 @@ import mongoose from "mongoose";
 import cors from "cors";
 import usersRouter from "./src/router/user.js";
 import questionsRouter from "./src/router/question.js";
+import answersRouter from "./src/router/answers.js";
 
 const app = express();
 app.use(cors());
@@ -18,6 +19,7 @@ mongoose
 
 app.use(usersRouter);
 app.use(questionsRouter);
+app.use(answersRouter);
 
 app.use((req, res) => {
   return res.status(404).json({ message: "This endpoint doesn't exist." });

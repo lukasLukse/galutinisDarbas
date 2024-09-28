@@ -7,7 +7,7 @@ const POST_QUESTION = async (req, res) => {
       id: uuidv4(),
       userId: req.body.userId,
       name: req.body.name,
-      date: new Date(),
+      date: new Date().toLocaleString(),
       question: req.body.question,
     };
 
