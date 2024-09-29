@@ -5,9 +5,10 @@ const POST_ANSWER = async (req, res) => {
   try {
     const answer = {
       id: uuidv4(),
+      name: req.body.name,
+      userId: req.body.userId,
       answerText: req.body.answerText,
       date: new Date().toLocaleString(),
-      gained_likes_number: req.body.gained_likes_number || 0,
       question_id: req.params.id,
     };
 
@@ -44,16 +45,23 @@ const GET_ANSWERS = async (req, res) => {
 
 const DELETE_ANSWER = async (req, res) => {
   try {
-    const answerId = req.params.id;
-    const deletedAnswer = await AnswersModel.findOneAndDelete({
-      id: answerId,
-    });
+    const answer = await AnswersModel.findOne({ id: req.params.id });
 
-    if (!deletedAnswer) {
+    if (!answer) {
       return res.status(404).json({ message: "Answer not found." });
     }
 
-    return res.status(200).json({ message: "Answer deleted successfully." });
+    if (answer.userId !== req.body.userId) {
+      return res
+        .status(403)
+        .json({ message: "You are not authorized to delete this answer." });
+    }
+
+    await AnswersModel.findOneAndDelete({ id: req.params.id });
+
+    return res
+      .status(200)
+      .json({ message: "Answer deleted successfully.", answer });
   } catch (err) {
     console.log(err);
     return res.status(500).json({ message: "Error in application." });

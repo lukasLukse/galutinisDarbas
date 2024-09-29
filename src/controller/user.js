@@ -3,16 +3,28 @@ import UserModel from "../model/user.js";
 import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
 
+const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
 const REGISTER = async (req, res) => {
   try {
-    const salt = bcrypt.genSaltSync(10);
+    const { name, email, password } = req.body;
 
-    const hash = bcrypt.hashSync(req.body.password, salt);
+    if (!emailRegex.test(email)) {
+      return res.status(400).json({ message: "Invalid email format." });
+    }
+
+    const existingUser = await UserModel.findOne({ email });
+    if (existingUser) {
+      return res.status(409).json({ message: "Email already registered." });
+    }
+
+    const salt = bcrypt.genSaltSync(10);
+    const hash = bcrypt.hashSync(password, salt);
 
     const user = {
       id: uuidv4(),
-      name: req.body.name,
-      email: req.body.email,
+      name: name,
+      email: email,
       password: hash,
     };
 
@@ -22,10 +34,10 @@ const REGISTER = async (req, res) => {
 
     return res
       .status(201)
-      .json({ message: "Your register is succsesfull.", response: response });
+      .json({ message: "Registration successful.", response });
   } catch (err) {
-    console.log(err);
-    return res.status(500).json({ message: "error in application" });
+    console.error(err);
+    return res.status(500).json({ message: "Error in application" });
   }
 };
 
