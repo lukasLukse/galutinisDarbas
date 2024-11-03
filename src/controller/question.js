@@ -80,10 +80,35 @@ const DELETE_QUESTION = async (req, res) => {
   }
 };
 
+export const POST_LIKE = async (req, res) => {
+  try {
+    const question = await QuestionModel.findOne({ id });
+    if (!question) {
+      return res.status(404).json({ message: "Question not found." });
+    }
+
+    if (question.likes.includes(req.user.id)) {
+      question.likes = question.likes.filter((id) => id !== req.user.id);
+    } else {
+      question.likes.push(req.user.id);
+    }
+
+    await question.save();
+
+    return res
+      .status(200)
+      .json({ message: "Like status updated.", likes: question.likes.length });
+  } catch (err) {
+    console.log(err);
+    return res.status(500).json({ message: "Error updating like status." });
+  }
+};
+
 export {
   GET_QUESTIONS,
   POST_QUESTION,
   DELETE_QUESTION,
   GET_QUESTION_BY_ID,
   GET_QUESTIONS_ALL,
+  POST_LIKE,
 };

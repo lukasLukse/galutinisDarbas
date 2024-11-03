@@ -6,6 +6,7 @@ const questionSchema = mongoose.Schema({
   userId: { type: String, required: true },
   date: { type: String, required: true },
   question: { type: String, required: true },
+  likes: { type: [String], default: [] },
 });
 
 export default mongoose.model("Question", questionSchema);
