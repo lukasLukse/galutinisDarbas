@@ -1,12 +1,19 @@
 import { v4 as uuidv4 } from "uuid";
 import QuestionModel from "../model/question.js";
+import UserModel from "../model/user.js";
 
 const POST_QUESTION = async (req, res) => {
   try {
+    const user = await UserModel.findOne({ id: req.body.userId });
+
+    if (!user) {
+      return res.status(404).json({ message: "User not found." });
+    }
+
     const question = {
       id: uuidv4(),
-      userId: req.body.userId,
-      name: req.body.name,
+      userId: user.id,
+      name: user.name,
       date: new Date().toLocaleString(),
       question: req.body.question,
     };
@@ -80,29 +87,30 @@ const DELETE_QUESTION = async (req, res) => {
   }
 };
 
-const POST_LIKE = async (req, res) => {
-  try {
-    const question = await QuestionModel.findOne({ id });
-    if (!question) {
-      return res.status(404).json({ message: "Question not found." });
-    }
+// const POST_LIKE = async (req, res) => {
+//   try {
+//     const question = await QuestionModel.findOne({ id: req.params.id });
 
-    if (question.likes.includes(req.user.id)) {
-      question.likes = question.likes.filter((id) => id !== req.user.id);
-    } else {
-      question.likes.push(req.user.id);
-    }
+//     if (!question) {
+//       return res.status(404).json({ message: "Question not found." });
+//     }
 
-    await question.save();
+//     if (question.likes.some((like) => like.user === req.user.id)) {
+//       return res.status(400).json({ message: "Question already liked." });
+//     }
 
-    return res
-      .status(200)
-      .json({ message: "Like status updated.", likes: question.likes.length });
-  } catch (err) {
-    console.log(err);
-    return res.status(500).json({ message: "Error updating like status." });
-  }
-};
+//     question.likes.unshift({ user: req.user.id });
+
+//     await question.save();
+
+//     return res
+//       .status(200)
+//       .json({ message: "Question liked successfully.", question });
+//   } catch (err) {
+//     console.log(err);
+//     return res.status(500).json({ message: "Error in application." });
+//   }
+// };
 
 export {
   GET_QUESTIONS,
@@ -110,5 +118,5 @@ export {
   DELETE_QUESTION,
   GET_QUESTION_BY_ID,
   GET_QUESTIONS_ALL,
-  POST_LIKE,
+  // POST_LIKE,
 };
