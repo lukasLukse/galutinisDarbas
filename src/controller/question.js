@@ -80,7 +80,7 @@ const DELETE_QUESTION = async (req, res) => {
   }
 };
 
-export const POST_LIKE = async (req, res) => {
+const POST_LIKE = async (req, res) => {
   try {
     const question = await QuestionModel.findOne({ id });
     if (!question) {
